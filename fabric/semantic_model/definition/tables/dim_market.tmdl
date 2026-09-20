@@ -1,0 +1,55 @@
+table dim_market
+	lineageTag: dim-market
+
+	column market_key
+		dataType: string
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: market_key
+
+	column state
+		dataType: string
+		summarizeBy: none
+		sourceColumn: state
+		dataCategory: StateOrProvince
+
+	column district
+		dataType: string
+		summarizeBy: none
+		sourceColumn: district
+
+	column market
+		dataType: string
+		summarizeBy: none
+		sourceColumn: market
+
+	column is_actively_reporting
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: is_actively_reporting
+
+	column days_since_last_report
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: days_since_last_report
+
+	hierarchy 'Geography'
+		level State
+			column: state
+		level District
+			column: district
+		level Market
+			column: market
+
+	/// Markets dropping out is the dominant quality problem in this feed, so it
+	/// is surfaced as a first-class measure rather than left to be discovered.
+	measure 'Markets Gone Quiet' =
+			CALCULATE(COUNTROWS(dim_market), dim_market[is_actively_reporting] = FALSE())
+		formatString: #,0
+
+	partition dim_market = entity
+		mode: directLake
+		source
+			entityName: dim_market
+			schemaName: dbo

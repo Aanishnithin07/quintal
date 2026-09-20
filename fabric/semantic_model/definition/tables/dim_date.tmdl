@@ -1,0 +1,47 @@
+table dim_date
+	lineageTag: dim-date
+	dataCategory: Time
+
+	column date_key
+		dataType: int64
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column date_day
+		dataType: dateTime
+		formatString: dd MMM yyyy
+		isDataTypeInferred
+		summarizeBy: none
+		sourceColumn: date_day
+
+	column year
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: year
+
+	column month_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month
+
+	column month
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: month
+
+	/// Indian crop years run April-March. Calendar-year comparisons split a
+	/// single growing season in half and make seasonality unreadable.
+	column crop_year_start
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: crop_year_start
+
+	partition dim_date = entity
+		mode: directLake
+		source
+			entityName: dim_date
+			schemaName: dbo

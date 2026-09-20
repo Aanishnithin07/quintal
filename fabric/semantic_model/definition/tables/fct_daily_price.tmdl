@@ -1,0 +1,115 @@
+table fct_daily_price
+	lineageTag: fct-daily-price
+
+	/// Rupees per quintal, as published. Aggregating prices with SUM is
+	/// meaningless, so no implicit measures - every price figure below goes
+	/// through an explicit measure that states how it aggregates.
+	column price_key
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: price_key
+
+	column market_key
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: market_key
+
+	column commodity_key
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: commodity_key
+
+	column date_key
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column modal_price
+		dataType: double
+		formatString: "₹"#,0
+		summarizeBy: none
+		sourceColumn: modal_price
+
+	column min_price
+		dataType: double
+		formatString: "₹"#,0
+		summarizeBy: none
+		sourceColumn: min_price
+
+	column max_price
+		dataType: double
+		formatString: "₹"#,0
+		summarizeBy: none
+		sourceColumn: max_price
+
+	column price_spread_pct
+		dataType: double
+		formatString: #,0.0"%"
+		summarizeBy: none
+		sourceColumn: price_spread_pct
+
+	column arrival_date
+		dataType: dateTime
+		formatString: dd MMM yyyy
+		summarizeBy: none
+		sourceColumn: arrival_date
+
+	column reporting_lag_days
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: reporting_lag_days
+
+	measure 'Observations' = COUNTROWS(fct_daily_price)
+		formatString: #,0
+
+	/// Median, not average. Mandi prices are heavily skewed - a handful of
+	/// premium-grade lots will drag a mean well above what a typical seller
+	/// actually receives, which is the number people came here for.
+	measure 'Median Modal Price' = MEDIAN(fct_daily_price[modal_price])
+		formatString: "₹"#,0
+
+	measure 'Avg Spread %' = AVERAGE(fct_daily_price[price_spread_pct])
+		formatString: #,0.0"%"
+
+	measure 'Markets Reporting' = DISTINCTCOUNT(fct_daily_price[market_key])
+		formatString: #,0
+
+	/// The anomaly signal: today's median against the trailing 30 days for the
+	/// same commodity and market. REMOVEFILTERS on dim_date only, so the
+	/// commodity/market context the user selected is preserved.
+	measure 'Median Price 30D' =
+			VAR _last = MAX(dim_date[date_day])
+			RETURN
+				CALCULATE(
+					MEDIAN(fct_daily_price[modal_price]),
+					REMOVEFILTERS(dim_date),
+					dim_date[date_day] > _last - 30,
+					dim_date[date_day] <= _last
+				)
+		formatString: "₹"#,0
+
+	measure 'Price vs 30D %' =
+			VAR _now = [Median Modal Price]
+			VAR _base = [Median Price 30D]
+			RETURN DIVIDE(_now - _base, _base)
+		formatString: +#,0.0%;-#,0.0%;0.0%
+
+	/// Data-quality measures belong in the model, not in a separate report.
+	/// If a figure is built on a thin day, the person reading it should be able
+	/// to see that in the same visual.
+	measure 'Missing Price %' =
+			DIVIDE(
+				CALCULATE(COUNTROWS(fct_daily_price), fct_daily_price[is_missing_price] = TRUE()),
+				COUNTROWS(fct_daily_price)
+			)
+		formatString: #,0.0%
+
+	partition fct_daily_price = entity
+		mode: directLake
+		source
+			entityName: fct_daily_price
+			schemaName: dbo

@@ -1,0 +1,15 @@
+model Model
+	culture: en-IN
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-IN
+
+	/// Direct Lake over the gold Delta tables. No import refresh: the semantic
+	/// model reads the same files the Spark notebooks write, so "refresh" means
+	/// nothing more than the notebook having finished.
+	annotation PBI_ProTooling = ["DaxQueryView","TMDL"]
+
+ref table dim_date
+ref table dim_market
+ref table dim_commodity
+ref table fct_daily_price

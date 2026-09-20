@@ -1,0 +1,14 @@
+relationship fct_market
+	fromColumn: fct_daily_price.market_key
+	toColumn: dim_market.market_key
+	crossFilteringBehavior: oneDirection
+
+relationship fct_commodity
+	fromColumn: fct_daily_price.commodity_key
+	toColumn: dim_commodity.commodity_key
+	crossFilteringBehavior: oneDirection
+
+relationship fct_date
+	fromColumn: fct_daily_price.date_key
+	toColumn: dim_date.date_key
+	crossFilteringBehavior: oneDirection

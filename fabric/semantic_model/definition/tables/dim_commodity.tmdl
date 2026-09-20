@@ -1,0 +1,38 @@
+table dim_commodity
+	lineageTag: dim-commodity
+
+	column commodity_key
+		dataType: string
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: commodity_key
+
+	column commodity
+		dataType: string
+		summarizeBy: none
+		sourceColumn: commodity
+
+	column variety
+		dataType: string
+		summarizeBy: none
+		sourceColumn: variety
+
+	column grade
+		dataType: string
+		summarizeBy: none
+		sourceColumn: grade
+
+	hierarchy 'Commodity Detail'
+		level Commodity
+			column: commodity
+		level Variety
+			column: variety
+		level Grade
+			column: grade
+
+	partition dim_commodity = entity
+		mode: directLake
+		source
+			entityName: dim_commodity
+			schemaName: dbo
