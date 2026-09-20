@@ -4,6 +4,9 @@
 rebuilt daily, because the official source keeps no history.**
 
 [![Daily mandi snapshot](https://github.com/Aanishnithin07/mandi-archive/actions/workflows/capture.yml/badge.svg)](https://github.com/Aanishnithin07/mandi-archive/actions/workflows/capture.yml)
+[![Build and test warehouse](https://github.com/Aanishnithin07/mandi-archive/actions/workflows/transform.yml/badge.svg)](https://github.com/Aanishnithin07/mandi-archive/actions/workflows/transform.yml)
+
+**[View the dashboard →](https://aanishnithin07.github.io/mandi-archive/)**
 
 ---
 
@@ -52,6 +55,12 @@ Bronze is **append-only and never rewritten**. If the publisher sends something
 malformed, that is preserved too — the archive records what was actually
 published, not a cleaned-up version of it. Corrections belong downstream.
 
+## How it is built
+
+Full reasoning for every non-obvious choice — including four bugs found by
+running the pipeline rather than reasoning about it — is in
+**[docs/DECISIONS.md](docs/DECISIONS.md)**.
+
 ## Architecture
 
 ```
@@ -61,16 +70,20 @@ published, not a cleaned-up version of it. Corrections belong downstream.
        ▼
   BRONZE   immutable daily snapshots + manifests        ← irreplaceable
        │
-       │  dbt-duckdb ── parse, conform, dedupe, SCD2
+       │  dbt-duckdb ── parse, conform, dedupe, flag
        ▼
   SILVER   typed, deduplicated observations             ← rebuildable
        │
        │  dbt-duckdb ── star schema
        ▼
-  GOLD     fct_daily_price · dim_market · dim_commodity
-       │   dim_date · dim_geography
+  GOLD     fct_daily_price · fct_price_anomaly
+       │   dim_market · dim_commodity · dim_date
+       │   dq_snapshot_health
        ▼
-  SERVE    Evidence.dev dashboard · published dataset
+  SERVE    static dashboard (GitHub Pages)
+           │
+           └── fabric/ ── same logic as PySpark + a Direct Lake
+                          semantic model, for when a capacity exists
 ```
 
 Orchestrated by GitHub Actions on a thrice-daily cron. The
@@ -135,12 +148,26 @@ payment details) lifts the cap and cuts this to seconds. Set it as the
 
 ## Status
 
-- [x] Daily capture, scheduled and self-healing
+- [x] Daily capture, scheduled, resumable, self-healing
 - [x] Immutable bronze with per-snapshot integrity manifests
-- [ ] dbt silver/gold star schema
-- [ ] Price-anomaly detection and data-quality scorecard
-- [ ] Public dashboard
+- [x] dbt silver/gold star schema, 39 tests passing in CI
+- [x] Price-anomaly detection and per-capture health scorecard
+- [x] Public dashboard, rebuilt from bronze on every change
+- [x] Fabric deployment path, verified against dbt by equivalence
 - [ ] Mirrored as a Hugging Face dataset
+- [ ] Registered API key (see below — currently capture is rate-limited)
+
+### Known limitation: the API key
+
+Captures currently run on data.gov.in's public demo key, which is capped at
+**10 rows per request** and rate-limits after roughly 25 requests. The first
+scheduled run collected 587 of 9,912 available rows in 20 minutes before
+upstream stopped responding, then preserved what it had and marked the day
+resumable — which is the designed behaviour, but it is not a complete day.
+
+A free registered key (email only, no payment details) removes the cap. Until
+one is set as the `DATA_GOV_API_KEY` secret, daily snapshots will be partial.
+See [docs/SETUP.md](docs/SETUP.md).
 
 ## Attribution
 
