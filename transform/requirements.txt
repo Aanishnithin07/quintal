@@ -1,0 +1,4 @@
+# Transform layer only. The capture step deliberately has no requirements file
+# because it deliberately has no dependencies -- see ingest/capture.py.
+dbt-duckdb>=1.9,<2
+duckdb>=1.1

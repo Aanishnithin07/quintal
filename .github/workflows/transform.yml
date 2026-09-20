@@ -1,0 +1,66 @@
+name: Build and test warehouse
+
+# Runs after every capture. This is the quality gate: if the archive's own
+# tests fail, that is visible here rather than in somebody's chart three weeks
+# later. It does not gate the capture itself -- capturing bad data is still far
+# better than capturing none, because bad data can be fixed downstream and a
+# missed day cannot be fixed at all.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/bronze/**"
+      - "transform/**"
+      - ".github/workflows/transform.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dbt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: transform/requirements.txt
+
+      - run: pip install -r transform/requirements.txt
+
+      - name: dbt build
+        working-directory: transform
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/transform
+          MANDI_BRONZE_GLOB: ${{ github.workspace }}/data/bronze/*/records.jsonl.gz
+        run: dbt build --no-partial-parse
+
+      - name: Publish data quality report
+        if: always()
+        working-directory: transform
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/transform
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import duckdb, pathlib
+          db = pathlib.Path("../data/warehouse.duckdb")
+          if not db.exists():
+              print("## Warehouse not built\n\nThe dbt build failed before producing a warehouse."); raise SystemExit
+          c = duckdb.connect(str(db), read_only=True)
+          print("## Archive health\n")
+          rows = c.sql("""
+            select ingest_date, rows_captured, markets_reporting, commodities,
+                   states, missing_price_pct, volume_verdict
+            from gold.dq_snapshot_health order by ingest_date desc limit 14
+          """)
+          print("| " + " | ".join(rows.columns) + " |")
+          print("|" + "---|" * len(rows.columns))
+          for r in rows.fetchall():
+              print("| " + " | ".join(str(v) for v in r) + " |")
+          tot = c.sql("select count(*), count(distinct arrival_date), count(distinct market_key) from gold.fct_daily_price").fetchone()
+          print(f"\n**Archive totals:** {tot[0]:,} observations across {tot[1]} market-days and {tot[2]:,} markets.")
+          PY

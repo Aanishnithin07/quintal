@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: fct_daily_price
+    description: One price observation per market x commodity x market-day.
+    columns:
+      - name: price_key
+        tests: [unique, not_null]
+      - name: market_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_market')
+                field: market_key
+      - name: commodity_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_commodity')
+                field: commodity_key
+      - name: date_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: arrival_date
+        tests: [not_null]
+
+  - name: dim_market
+    description: One row per market, with observed reporting lifespan.
+    columns:
+      - name: market_key
+        tests: [unique, not_null]
+      - name: market
+        tests: [not_null]
+
+  - name: dim_commodity
+    description: One row per commodity x variety x grade.
+    columns:
+      - name: commodity_key
+        tests: [unique, not_null]
+      - name: commodity
+        tests: [not_null]
+
+  - name: dim_date
+    columns:
+      - name: date_key
+        tests: [unique, not_null]
+      - name: date_day
+        tests: [unique, not_null]
+
+  - name: dq_snapshot_health
+    description: Per-capture health record; the archive watching its own shape.
+    columns:
+      - name: ingest_date
+        tests: [unique, not_null]
+      - name: volume_verdict
+        tests:
+          - accepted_values:
+              arguments:
+                values: [normal, suspiciously_low, suspiciously_high, insufficient_history]

@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: stg_mandi_prices
+    description: >
+      Typed, deduplicated price observations parsed from the immutable bronze
+      snapshots. Quality problems are flagged here, never filtered -- silver
+      describes what the publisher sent; the marts decide what to exclude.
+    columns:
+      - name: price_key
+        description: Surrogate key over the full grain.
+        tests: [unique, not_null]
+      - name: ingest_date
+        description: IST day the snapshot was captured. Never null - it comes from the partition path.
+        tests: [not_null]
+      - name: state
+        tests: [not_null]
+      - name: market
+        tests: [not_null]
+      - name: commodity
+        tests: [not_null]
+      - name: modal_price
+        description: Rupees per quintal. Null where upstream sent 0, blank, or negative.
+      - name: reporting_lag_days
+        description: ingest_date - arrival_date. Positive when a market reports late.
