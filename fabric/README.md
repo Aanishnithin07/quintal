@@ -1,18 +1,26 @@
 # Fabric deployment path
 
-## Status: written, not yet executed
+## Status: logic verified on Spark, not deployed to a tenant
 
-**These artefacts have not been run against a live Fabric tenant.** The archive
-is developed without a Fabric capacity — there is no free tier, and the 60-day
-trial requires a work or school tenant. The PySpark and TMDL here are kept as a
-tested-by-equivalence deployment path, not as a claim of a working deployment.
+Two different claims, kept apart deliberately.
 
-What *is* verified is the logic itself: `notebooks/01_bronze_to_silver.py` is a
-line-for-line translation of `transform/models/staging/stg_mandi_prices.sql`,
-which runs daily in CI with 36 passing dbt tests. The transformations are
-proven; their execution on Fabric Spark is not.
+**Verified.** `notebooks/01_bronze_to_silver.py` produces *byte-identical*
+output to `transform/models/staging/stg_mandi_prices.sql`. Not "equivalent by
+inspection" — the same SHA-256 over the same bronze files, asserted on every
+push by [`.github/workflows/equivalence.yml`](../.github/workflows/equivalence.yml),
+running Spark 3.5 on Java 17: the versions Fabric Runtime 1.3 ships.
 
-That distinction is deliberate and stated here rather than glossed over.
+The test executes the notebook's *own source* rather than a copy, because a
+copy drifts silently and would end up reporting agreement between two things
+that are no longer the same code.
+
+**Not verified.** None of this has run in a Fabric workspace. The archive is
+built without a Fabric capacity — there is no free tier, and the 60-day trial
+requires a work or school tenant. Direct Lake binding, the TMDL semantic model,
+and the `fabric-cicd` deployment are untested against the real service.
+
+So: the transformations are proven correct on Spark. Their behaviour *inside
+Fabric* is a reasonable expectation, not a demonstrated fact.
 
 ## Why the project is built this way
 

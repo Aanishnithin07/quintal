@@ -1,0 +1,56 @@
+name: Spark/dbt equivalence
+
+# The Fabric notebooks cannot be tested in Fabric - there is no capacity. They
+# CAN be tested by equivalence: run the notebook's own source on Spark over the
+# same bronze files and require byte-identical output to dbt's.
+#
+# This runs in CI so the claim stays true. An equivalence proved once and never
+# re-checked decays into a comment, and a stale comment about correctness is
+# worse than none.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "fabric/**"
+      - "transform/**"
+      - "ingest/**"
+      - ".github/workflows/equivalence.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  equivalence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      # Java 17, not 21: Spark 3.5 is what Fabric Runtime 1.3 ships, and on
+      # Java 21 Hadoop calls Subject.getSubject, which JEP 411 disabled. Testing
+      # on the runtime being targeted is the entire point.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: transform/requirements.txt
+
+      - run: pip install -r transform/requirements.txt "pyspark==3.5.3"
+
+      - name: Build dbt warehouse
+        working-directory: transform
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/transform
+          MANDI_BRONZE_GLOB: ${{ github.workspace }}/data/bronze/*/records.jsonl.gz
+        run: dbt build --no-partial-parse
+
+      - name: Assert Spark and dbt agree
+        env:
+          PYSPARK_PYTHON: python
+        run: python fabric/tests/test_spark_dbt_equivalence.py

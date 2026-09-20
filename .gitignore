@@ -20,3 +20,6 @@ site/index.html
 
 # Local secrets
 .env
+
+# Atomic-write temporaries; never committed, never left behind.
+data/bronze/**/*.tmp

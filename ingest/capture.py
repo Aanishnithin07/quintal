@@ -283,9 +283,20 @@ def write_snapshot(root: Path, day: str, records: list[dict], meta: dict) -> Pat
     payload = "\n".join(
         json.dumps(r, sort_keys=True, ensure_ascii=False) for r in records
     ).encode("utf-8")
+
+    # Written to a temp file and moved into place, because os.replace is atomic
+    # on POSIX. Writing in place risks a runner timeout or cancellation landing
+    # mid-write, which would leave a truncated archive whose manifest still
+    # claimed the full row count -- and on resume _load_partial would fail to
+    # parse it and silently start the day over from zero.
+    tmp = data_path.with_suffix(".gz.tmp")
     # mtime=0 so gzip framing does not change between runs either.
-    with gzip.GzipFile(filename="", mode="wb", fileobj=open(data_path, "wb"), mtime=0) as gz:
-        gz.write(payload)
+    with open(tmp, "wb") as fh:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=fh, mtime=0) as gz:
+            gz.write(payload)
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, data_path)
 
     manifest = {
         "ingest_date_ist": day,
@@ -298,7 +309,11 @@ def write_snapshot(root: Path, day: str, records: list[dict], meta: dict) -> Pat
         **meta,
         "quality": validate(records),
     }
-    (out_dir / "_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    # Manifest last, and atomically: it is the marker that the snapshot beside
+    # it is trustworthy, so it must never appear before the data it describes.
+    mtmp = out_dir / "_manifest.json.tmp"
+    mtmp.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    os.replace(mtmp, out_dir / "_manifest.json")
     return data_path
 
 
