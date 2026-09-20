@@ -361,20 +361,20 @@ def build(d: dict, generated: str) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mandi Archive</title>
+<title>Quintal — Indian mandi prices</title>
 <meta name="description" content="Open daily archive of Indian agricultural commodity prices.">
 <style>{css()}</style>
 </head>
 <body>
 <div class="wrap">
 <header>
-  <h1>Mandi Archive</h1>
+  <h1>Quintal</h1>
   <p>An open, continuous record of Indian agricultural commodity prices. The
      official source publishes only today's prices and keeps no history, so this
      captures that snapshot every day and preserves it.</p>
   <p class="stamp">Generated {e(generated)} ·
      latest capture {e(latest[0]) if latest else "—"} ·
-     <a href="https://github.com/Aanishnithin07/mandi-archive">source</a></p>
+     <a href="https://github.com/Aanishnithin07/quintal">source</a></p>
 </header>
 
 <div class="kpis">{kpi_html}</div>

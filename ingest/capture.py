@@ -48,7 +48,7 @@ IST = timezone(timedelta(hours=5, minutes=30))
 # badly wrong upstream and we should stop rather than loop forever.
 HARD_OFFSET_CAP = 200_000
 
-USER_AGENT = "mandi-archive/1.0 (open agricultural price archive; +https://github.com/Aanishnithin07)"
+USER_AGENT = "quintal/1.0 (open agricultural price archive; +https://github.com/Aanishnithin07/quintal)"
 
 EXPECTED_FIELDS = (
     "state", "district", "market", "commodity", "variety", "grade",

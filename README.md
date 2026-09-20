@@ -1,12 +1,14 @@
-# Mandi Archive
+# Quintal
 
 **An open, continuous historical archive of Indian agricultural commodity prices —
 rebuilt daily, because the official source keeps no history.**
 
-[![Daily mandi snapshot](https://github.com/Aanishnithin07/mandi-archive/actions/workflows/capture.yml/badge.svg)](https://github.com/Aanishnithin07/mandi-archive/actions/workflows/capture.yml)
-[![Build and test warehouse](https://github.com/Aanishnithin07/mandi-archive/actions/workflows/transform.yml/badge.svg)](https://github.com/Aanishnithin07/mandi-archive/actions/workflows/transform.yml)
+*Named for the quintal (100 kg), the unit every price in this dataset is quoted in.*
 
-**[View the dashboard →](https://aanishnithin07.github.io/mandi-archive/)**
+[![Daily mandi snapshot](https://github.com/Aanishnithin07/quintal/actions/workflows/capture.yml/badge.svg)](https://github.com/Aanishnithin07/quintal/actions/workflows/capture.yml)
+[![Build and test warehouse](https://github.com/Aanishnithin07/quintal/actions/workflows/transform.yml/badge.svg)](https://github.com/Aanishnithin07/quintal/actions/workflows/transform.yml)
+
+**[View the dashboard →](https://aanishnithin07.github.io/quintal/)**
 
 ---
 
@@ -119,8 +121,8 @@ the two genuinely differ. Keeping both preserves the distinction.
 ## Using the archive
 
 ```bash
-git clone https://github.com/Aanishnithin07/mandi-archive
-cd mandi-archive
+git clone https://github.com/Aanishnithin07/quintal
+cd quintal
 
 # Every observation ever captured, as one table
 python3 -c "
