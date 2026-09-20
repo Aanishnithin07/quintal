@@ -313,12 +313,15 @@ def build(d: dict, generated: str) -> str:
     captures = d["captures"]
     latest = captures[-1] if captures else None
 
+    def plural(n, one, many):
+        return one if n == 1 else many
+
     kpis = [
-        (fmt(obs), "price observations"),
-        (fmt(mdays), "market-days archived"),
-        (fmt(markets), "markets covered"),
-        (fmt(commodities), "commodities tracked"),
-        (fmt(len(captures)), "daily captures"),
+        (fmt(obs), plural(obs, "price observation", "price observations")),
+        (fmt(mdays), plural(mdays, "market-day archived", "market-days archived")),
+        (fmt(markets), plural(markets, "market covered", "markets covered")),
+        (fmt(commodities), plural(commodities, "commodity tracked", "commodities tracked")),
+        (fmt(len(captures)), plural(len(captures), "daily capture", "daily captures")),
     ]
     kpi_html = "".join(
         f'<div class="kpi"><div class="v">{v}</div><div class="l">{e(l)}</div></div>'
@@ -328,7 +331,9 @@ def build(d: dict, generated: str) -> str:
         if i == 7:
             s = VERDICT_STATUS.get(v, "muted")
             return f'<td><span class="badge {s}">{e(v)}</span></td>'
-        if i in (4, 5, 6):
+        if i in (4, 5):                       # price, 30d median: whole rupees
+            return f'<td class="num">{e(fmt(v) if v is not None else "—")}</td>'
+        if i == 6:                            # deviation %: one decimal
             return f'<td class="num">{e(fmt(v, 1) if v is not None else "—")}</td>'
         return f"<td>{e(v)}</td>"
 
@@ -345,8 +350,11 @@ def build(d: dict, generated: str) -> str:
             f'anything. The model reports that rather than inventing a verdict.</p>')
 
     def widest_cells(i, v):
-        return (f'<td class="num">{e(fmt(v, 1))}</td>' if i in (3, 4, 5)
-                else f"<td>{e(v)}</td>")
+        if i in (3, 4):                       # min/max price: whole rupees
+            return f'<td class="num">{e(fmt(v))}</td>'
+        if i == 5:                            # spread %: one decimal
+            return f'<td class="num">{e(fmt(v, 1))}</td>'
+        return f"<td>{e(v)}</td>"
 
     return f"""<!doctype html>
 <html lang="en">
