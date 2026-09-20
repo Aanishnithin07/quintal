@@ -16,6 +16,8 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 jobs:
   dbt:
@@ -64,3 +66,38 @@ jobs:
           tot = c.sql("select count(*), count(distinct arrival_date), count(distinct market_key) from gold.fct_daily_price").fetchone()
           print(f"\n**Archive totals:** {tot[0]:,} observations across {tot[1]} market-days and {tot[2]:,} markets.")
           PY
+
+  publish:
+    needs: dbt
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: transform/requirements.txt
+      - run: pip install -r transform/requirements.txt
+
+      # The dashboard is rebuilt from bronze rather than carried between jobs.
+      # Bronze is the only durable input, so a rebuild here is also a standing
+      # check that the whole chain still reproduces from source.
+      - name: Rebuild warehouse
+        working-directory: transform
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/transform
+          MANDI_BRONZE_GLOB: ${{ github.workspace }}/data/bronze/*/records.jsonl.gz
+        run: dbt build --no-partial-parse
+
+      - name: Render dashboard
+        run: python site/build_site.py
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

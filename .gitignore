@@ -14,8 +14,9 @@ data/gold/
 transform/target/
 transform/dbt_packages/
 transform/logs/
-dashboard/.evidence/
-dashboard/build/
+# The dashboard is rendered from gold in CI, so the HTML is derived like
+# everything else below bronze and is not committed.
+site/index.html
 
 # Local secrets
 .env
