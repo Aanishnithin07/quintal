@@ -63,3 +63,17 @@ models:
           - accepted_values:
               arguments:
                 values: [normal, suspiciously_low, suspiciously_high, insufficient_history]
+
+  - name: fct_price_anomaly
+    description: >
+      Each observation against its own market's trailing 30-day median.
+      Deliberately not benchmarked across markets: regional price differences
+      are normal, and flagging them would bury the real signal.
+    columns:
+      - name: arrival_date
+        tests: [not_null]
+      - name: verdict
+        tests:
+          - accepted_values:
+              arguments:
+                values: [normal, elevated, spike, depressed, collapse, insufficient_history]
