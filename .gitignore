@@ -1,0 +1,21 @@
+# Environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+node_modules/
+
+# Derived artefacts -- always rebuildable from data/bronze, never committed.
+# Bronze itself IS committed: it is the product and it cannot be re-fetched.
+data/silver/
+data/gold/
+*.duckdb
+*.duckdb.wal
+transform/target/
+transform/dbt_packages/
+transform/logs/
+dashboard/.evidence/
+dashboard/build/
+
+# Local secrets
+.env

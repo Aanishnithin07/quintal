@@ -1,0 +1,31 @@
+{
+  "ingest_date_ist": "2026-09-20",
+  "captured_at_utc": "2026-09-20T14:02:32+00:00",
+  "resource_id": "9ef84268-d588-465a-a308-a864a43d0070",
+  "schema_version": 1,
+  "sha256_uncompressed": "95018355ea255466bcb0e06014190b7f7aa4cb2fac5846decbbde2a92db43a98",
+  "bytes_uncompressed": 28322,
+  "bytes_on_disk": 2636,
+  "total_reported_by_upstream": 9359,
+  "rows_captured": 117,
+  "duplicates_removed": 0,
+  "publisher_updated_date": "2026-09-20T14:00:41Z",
+  "effective_page_size": 10,
+  "duration_seconds": 3.2,
+  "max_total_seen": 9359,
+  "stopped_because": "--max-pages=3",
+  "complete": false,
+  "api_key_mode": "demo(10-row cap)",
+  "quality": {
+    "missing_expected_fields": [],
+    "unexpected_new_fields": [],
+    "distinct_arrival_dates": 1,
+    "arrival_date_histogram": {
+      "20/09/2026": 117
+    },
+    "blank_price_cells": 0,
+    "distinct_states": 11,
+    "distinct_markets": 21,
+    "distinct_commodities": 52
+  }
+}

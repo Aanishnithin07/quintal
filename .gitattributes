@@ -1,0 +1,2 @@
+# Snapshots are compressed already; don't let git try to diff or normalise them.
+data/bronze/**/*.jsonl.gz binary

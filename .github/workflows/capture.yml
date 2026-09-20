@@ -1,0 +1,70 @@
+name: Daily mandi snapshot
+
+# The upstream API is snapshot-only: it serves today's prices and nothing else.
+# A missed day is lost permanently, so this runs several times a day and the
+# capture script no-ops if the day was already captured completely.
+on:
+  schedule:
+    - cron: "30 14 * * *"   # 20:00 IST - publisher typically refreshes ~18:30 IST
+    - cron: "30 17 * * *"   # 23:00 IST - safety net
+    - cron: "30 1  * * *"   # 07:00 IST - last chance before the day rolls over
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Re-capture even if today is already complete"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# Never let two runs race on the same commit.
+concurrency:
+  group: capture
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      # No setup-python step on purpose: capture.py is stdlib-only, so the
+      # runner's system Python is sufficient and there is nothing to install.
+      # Fewer moving parts means fewer ways to lose a day of history.
+      - name: Capture today's snapshot
+        id: capture
+        env:
+          DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+        run: |
+          set +e
+          python3 ingest/capture.py ${{ inputs.force && '--force' || '' }}
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          # 0 = captured or already complete, 2 = partial (still worth keeping)
+          [ "$code" -eq 1 ] && exit 1
+          exit 0
+
+      - name: Commit snapshot
+        run: |
+          git config user.name  "mandi-archive-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "nothing new to commit"; exit 0
+          fi
+          DAY=$(TZ=Asia/Kolkata date +%F)
+          ROWS=$(python3 -c "import json,glob,sys;f=glob.glob('data/bronze/ingest_date=$DAY/_manifest.json');print(json.load(open(f[0]))['rows_captured'] if f else '?')")
+          git commit -m "data: mandi snapshot $DAY ($ROWS rows)"
+          # A scheduled run can collide with a push; rebase rather than fail.
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push && exit 0
+            echo "push attempt $i failed; retrying"; sleep 5
+          done
+          exit 1
+
+      - name: Flag incomplete capture
+        if: steps.capture.outputs.exit_code == '2'
+        run: |
+          echo "::warning title=Incomplete snapshot::Captured fewer rows than upstream reported. Usually the 10-row demo key cap - set the DATA_GOV_API_KEY secret."
