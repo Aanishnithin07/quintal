@@ -1,17 +1,17 @@
 {
   "ingest_date_ist": "2026-09-20",
-  "captured_at_utc": "2026-09-20T17:06:11+00:00",
+  "captured_at_utc": "2026-09-20T17:48:35+00:00",
   "resource_id": "9ef84268-d588-465a-a308-a864a43d0070",
   "schema_version": 1,
-  "sha256_uncompressed": "bda8e37db6e5ea4700c69c649eaea65ee604919c765fc17759d732d8d09a64a9",
-  "bytes_uncompressed": 147299,
-  "bytes_on_disk": 9149,
+  "sha256_uncompressed": "8d1cdf89aa9cbc85776e44e9bba8d5aa45d290503b596edd304f227bdcf3002e",
+  "bytes_uncompressed": 148535,
+  "bytes_on_disk": 9214,
   "total_reported_by_upstream": 9971,
-  "rows_captured": 595,
-  "duplicates_removed": 2,
+  "rows_captured": 600,
+  "duplicates_removed": 5,
   "publisher_updated_date": "2026-09-20T17:00:46Z",
   "effective_page_size": 10,
-  "duration_seconds": 72.0,
+  "duration_seconds": 5.8,
   "max_total_seen": 9971,
   "stopped_because": "--max-pages=1",
   "complete": false,
@@ -21,7 +21,7 @@
     "unexpected_new_fields": [],
     "distinct_arrival_dates": 1,
     "arrival_date_histogram": {
-      "20/09/2026": 595
+      "20/09/2026": 600
     },
     "blank_price_cells": 0,
     "distinct_states": 11,
