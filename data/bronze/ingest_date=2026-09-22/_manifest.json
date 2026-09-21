@@ -1,18 +1,18 @@
 {
   "ingest_date_ist": "2026-09-22",
-  "captured_at_utc": "2026-09-21T20:00:17+00:00",
+  "captured_at_utc": "2026-09-21T21:44:07+00:00",
   "resource_id": "9ef84268-d588-465a-a308-a864a43d0070",
   "schema_version": 1,
-  "sha256_uncompressed": "b5614026aa7f9c5fd9a69d11c3cb5be58b261d9d07d46d495a1dcb6bb6648f4a",
-  "bytes_uncompressed": 1182538,
-  "bytes_on_disk": 104901,
-  "total_reported_by_upstream": 18200,
-  "rows_captured": 4923,
-  "duplicates_removed": 1387,
-  "publisher_updated_date": "2026-09-21T19:00:58Z",
+  "sha256_uncompressed": "1bb695c85f31560000b951633f1b2ce1cb64b1b3f4b7a272eac0fab1a5ae64e9",
+  "bytes_uncompressed": 2068722,
+  "bytes_on_disk": 177365,
+  "total_reported_by_upstream": 18201,
+  "rows_captured": 8607,
+  "duplicates_removed": 1393,
+  "publisher_updated_date": "2026-09-21T21:00:41Z",
   "effective_page_size": 10,
-  "duration_seconds": 1421.9,
-  "max_total_seen": 18200,
+  "duration_seconds": 1900.1,
+  "max_total_seen": 18201,
   "stopped_because": null,
   "complete": true,
   "api_key_mode": "demo(10-row cap)",
@@ -21,11 +21,11 @@
     "unexpected_new_fields": [],
     "distinct_arrival_dates": 1,
     "arrival_date_histogram": {
-      "21/09/2026": 4923
+      "21/09/2026": 8607
     },
     "blank_price_cells": 0,
     "distinct_states": 27,
-    "distinct_markets": 1253,
-    "distinct_commodities": 203
+    "distinct_markets": 1589,
+    "distinct_commodities": 233
   }
 }
