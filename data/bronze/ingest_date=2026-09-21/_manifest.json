@@ -1,31 +1,32 @@
 {
   "ingest_date_ist": "2026-09-21",
-  "captured_at_utc": "2026-09-20T19:56:42+00:00",
+  "captured_at_utc": "2026-09-21T07:07:00+00:00",
   "resource_id": "9ef84268-d588-465a-a308-a864a43d0070",
   "schema_version": 1,
-  "sha256_uncompressed": "d1cb14ac84222aec3574e68114608ff2a078956b0f1304eee4cbe426e4ec5cf9",
-  "bytes_uncompressed": 141300,
-  "bytes_on_disk": 9182,
-  "total_reported_by_upstream": 10127,
-  "rows_captured": 570,
+  "sha256_uncompressed": "5871fb83efb1d78c58ef27f93e925c4ce2760f68d9594a9ac01fde5aca21b3b8",
+  "bytes_uncompressed": 193251,
+  "bytes_on_disk": 13318,
+  "total_reported_by_upstream": 9601,
+  "rows_captured": 780,
   "duplicates_removed": 0,
-  "publisher_updated_date": "2026-09-20T19:00:49Z",
+  "publisher_updated_date": "2026-09-21T06:00:44Z",
   "effective_page_size": 10,
-  "duration_seconds": 1022.5,
-  "max_total_seen": 10127,
+  "duration_seconds": 490.3,
+  "max_total_seen": 9601,
   "stopped_because": "CaptureError: upstream unreachable after 5 attempts: URLError(TimeoutError('timed out'))",
   "complete": false,
   "api_key_mode": "demo(10-row cap)",
   "quality": {
     "missing_expected_fields": [],
     "unexpected_new_fields": [],
-    "distinct_arrival_dates": 1,
+    "distinct_arrival_dates": 2,
     "arrival_date_histogram": {
-      "20/09/2026": 570
+      "20/09/2026": 570,
+      "21/09/2026": 210
     },
     "blank_price_cells": 0,
-    "distinct_states": 11,
-    "distinct_markets": 94,
-    "distinct_commodities": 81
+    "distinct_states": 16,
+    "distinct_markets": 159,
+    "distinct_commodities": 107
   }
 }
