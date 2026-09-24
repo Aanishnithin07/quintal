@@ -1,31 +1,31 @@
 {
   "ingest_date_ist": "2026-09-24",
-  "captured_at_utc": "2026-09-23T21:00:12+00:00",
+  "captured_at_utc": "2026-09-24T18:32:49+00:00",
   "resource_id": "9ef84268-d588-465a-a308-a864a43d0070",
   "schema_version": 1,
-  "sha256_uncompressed": "caa60e179c0db1b6e56748ebf0dd426c7a755108503afe21d9c997f32820a0e1",
-  "bytes_uncompressed": 1163067,
-  "bytes_on_disk": 102170,
-  "total_reported_by_upstream": 18591,
-  "rows_captured": 4842,
-  "duplicates_removed": 1058,
-  "publisher_updated_date": "2026-09-23T20:00:56Z",
+  "sha256_uncompressed": "140093b259658fdb7171dbc906dce4fa0aed7ab36629d7ed8d982dd0e2e265e0",
+  "bytes_uncompressed": 54438,
+  "bytes_on_disk": 5249,
+  "total_reported_by_upstream": 19100,
+  "rows_captured": 230,
+  "duplicates_removed": 0,
+  "publisher_updated_date": "2026-09-24T18:01:05Z",
   "effective_page_size": 10,
-  "duration_seconds": 1408.5,
-  "max_total_seen": 18591,
-  "stopped_because": null,
-  "complete": true,
+  "duration_seconds": 203.2,
+  "max_total_seen": 19100,
+  "stopped_because": "RateLimited: still rate limited after 3 waits",
+  "complete": false,
   "api_key_mode": "demo(10-row cap)",
   "quality": {
     "missing_expected_fields": [],
     "unexpected_new_fields": [],
     "distinct_arrival_dates": 1,
     "arrival_date_histogram": {
-      "23/09/2026": 4842
+      "24/09/2026": 230
     },
     "blank_price_cells": 0,
-    "distinct_states": 26,
-    "distinct_markets": 1300,
-    "distinct_commodities": 205
+    "distinct_states": 15,
+    "distinct_markets": 75,
+    "distinct_commodities": 83
   }
 }
